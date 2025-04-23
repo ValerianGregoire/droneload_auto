@@ -24,8 +24,10 @@ This repository must be placed in `~/ros2_ws/src/`, but also contains the code t
 
 Run this command in a terminal within the repository folder to install ROS 2 automatically.
 
-`chmod x+ install_ros2.sh
-./install_ros2.sh`
+```shell
+chmod x+ install_ros2.sh
+./install_ros2.sh
+```
 
 ---
 
@@ -35,24 +37,27 @@ Run the commands below in a terminal to set up your development environment on a
 
 ### 1. Setup Locale
 
-`bash
+```shell
+bash
 sudo apt update && sudo apt install locales
 sudo locale-gen en_US en_US.UTF-8
 sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
-export LANG=en_US.UTF-8`
+export LANG=en_US.UTF-8
+```
 
 ### 2. Add the ROS 2 apt repository
 
-`
+```shell
 sudo apt install software-properties-common
 sudo add-apt-repository universe
 sudo apt update && sudo apt install curl -y
 sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null`
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+```
 
 ### 3. Install development tools and ROS tools
 
-`
+```shell
 sudo apt update && sudo apt install -y \
   python3-flake8-docstrings \
   python3-pip \
@@ -67,25 +72,30 @@ sudo apt install -y \
    python3-flake8-import-order \
    python3-flake8-quotes \
    python3-pytest-repeat \
-   python3-pytest-rerunfailures`
+   python3-pytest-rerunfailures
+```
 
 ### 4. Get ROS 2 code
 
-`
+```shell
 mkdir -p ~/ros2_humble/src
 cd ~/ros2_humble
-vcs import --input https://raw.githubusercontent.com/ros2/ros2/humble/ros2.repos src`
+vcs import --input https://raw.githubusercontent.com/ros2/ros2/humble/ros2.repos src
+```
 
 ### 5. Install dependencies using rosdep
 
-`
+```shell
 sudo apt upgrade
 sudo rosdep init
 rosdep update
-rosdep install --from-paths src --ignore-src -y --skip-keys "fastcdr rti-connext-dds-6.0.1 urdfdom_headers"`
+rosdep install --from-paths src --ignore-src -y --skip-keys "fastcdr rti-connext-dds-6.0.1 urdfdom_headers"
+```
 
 ### 6. Build the code in the workspace
 
+```shell
 cd ~/ros2_humble/
 colcon build --symlink-install
+```
 
