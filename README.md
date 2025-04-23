@@ -59,6 +59,7 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-a
 
 ```shell
 sudo apt update && sudo apt install -y \
+  build-essential \
   python3-flake8-docstrings \
   python3-pip \
   python3-pytest-cov \
