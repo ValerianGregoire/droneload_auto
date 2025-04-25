@@ -20,7 +20,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-        	'hello_world = droneload_auto.hello_world:main'
+        	'hello_world = droneload_auto.hello_world:main',
+            'lidar_read = droneload_auto.lidar_read:main',
+            'camera_read = droneload_auto.camera_read:main'
         ],
     },
 )
