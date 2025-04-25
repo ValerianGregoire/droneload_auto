@@ -52,9 +52,10 @@ source ~/.bashrc
 # Create a workspace
 mkdir -p ~/ros2_ws/src
 
-# Add the current package to the workspace 
+# Add the packages to the workspace 
 cd ~/ros2_ws/src
 git clone https://github.com/ValerianGregoire/droneload_auto.git
+git clone https://github.com/ValerianGregoire/droneload_interfaces.git
 
 # Build the workspace
 cd ~/ros2_ws

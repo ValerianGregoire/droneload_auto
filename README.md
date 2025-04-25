@@ -111,8 +111,14 @@ source ~/.bashrc
 mkdir -p ~/ros2_ws/src
 ```
 
-### 9. Add the current package to the workspace 
-Move droneload_auto to ~/ros2_ws/src
+### 9. Add the packages to the workspace 
+Clone the package in the workspace (again) and clone the interfaces package to use topics and services.
+
+```shell
+cd ~/ros2_ws/src
+git clone https://github.com/ValerianGregoire/droneload_auto.git
+git clone https://github.com/ValerianGregoire/droneload_interfaces.git
+```
 
 ### 10. Build the workspace
 ```shell
