@@ -44,3 +44,23 @@ rosdep install --from-paths src --ignore-src -y --skip-keys "fastcdr rti-connext
 # Build the code in the workspace
 cd ~/ros2_humble/
 colcon build --symlink-install
+
+# Source ROS 2 in all terminals
+echo "source ~/ros2_humble/install/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+
+# Create a workspace
+mkdir -p ~/ros2_ws/src
+
+# Add the current package to the workspace 
+cd ~/ros2_ws/src
+git clone https://github.com/ValerianGregoire/droneload_auto.git
+
+# Build the workspace
+cd ~/ros2_ws
+colcon build
+
+# Source the workspace in all terminals
+echo "source ~/ros2_ws/install/local_setup.bash" >> ~/.bashrc
+source ~/.bashrc
+

@@ -22,10 +22,10 @@ This repository must be placed in `~/ros2_ws/src/`, but also contains the code t
 
 ### Shell script execution
 
-Run this command in a terminal within the repository folder to install ROS 2 automatically.
+Run this command in a terminal within the repository folder to install ROS 2 automatically. Note that the automatic installation will create a copy of the current directory in `~/ros2_ws/src/`.
 
 ```shell
-chmod x+ install_ros2.sh
+chmod +x install_ros2.sh
 ./install_ros2.sh
 ```
 
@@ -100,3 +100,28 @@ cd ~/ros2_humble/
 colcon build --symlink-install
 ```
 
+### 7. Source ROS 2 in all terminals
+```shell
+echo "source ~/ros2_humble/install/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+```
+
+### 8. Create a workspace
+```shell
+mkdir -p ~/ros2_ws/src
+```
+
+### 9. Add the current package to the workspace 
+Move droneload_auto to ~/ros2_ws/src
+
+### 10. Build the workspace
+```shell
+cd ~/ros2_ws
+colcon build
+```
+
+### 11. Source the workspace in all terminals
+```shell
+echo "source ~/ros2_ws/install/local_setup.bash" >> ~/.bashrc
+source ~/.bashrc
+```
