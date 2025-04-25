@@ -20,6 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+        	'hello_world = droneload_auto.hello_world:main'
         ],
     },
 )
+
