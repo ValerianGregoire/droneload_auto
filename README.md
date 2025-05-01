@@ -118,6 +118,8 @@ Clone the package in the workspace (again) and clone the interfaces package to u
 cd ~/ros2_ws/src
 git clone https://github.com/ValerianGregoire/droneload_auto.git
 git clone https://github.com/ValerianGregoire/droneload_interfaces.git
+git clone https://github.com/PX4/px4_ros_com.git
+git clone https://github.com/PX4/px4_msgs.git
 ```
 
 ### 10. Build the workspace
@@ -131,3 +133,5 @@ colcon build
 echo "source ~/ros2_ws/install/local_setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
+
+### 12. Download 
