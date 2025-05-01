@@ -1,6 +1,21 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+def detect_obstacle(distances):
+    """
+    Detects obstacles from an array of distances
+    
+    @inputs:
+        distances: np.ndarray -> Array of distances in mm of shape (1,X)
+    
+    @outputs:
+        obstacles: np.ndarray
+        obstacles_starts: np.ndarray
+        obstacles_ends: np.ndarray
+
+    """
+    pass
+
 if __name__ == "__main__":
     # Creation of lidar data array
     shape = (1,360)
@@ -47,5 +62,6 @@ if __name__ == "__main__":
     axs[2].set_title("Lidar Data With Sphere")
     axs[3].plot(lidar_data_obstacles.T)
     axs[3].set_title("Lidar Data With Both Obstacles")
+
     fig.tight_layout()
     plt.show()
