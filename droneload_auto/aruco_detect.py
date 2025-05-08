@@ -29,6 +29,7 @@ from rclpy.node import Node
 import cv2
 import numpy as np
 from droneload_interfaces.msg import CameraData
+from droneload_interfaces.msg import ArucoData
 
 
 class ArucoDetect(Node):
@@ -56,7 +57,7 @@ class ArucoDetect(Node):
 
 
         #### PUBLICATION BLOCK START ####
-        self.publisher = self.create_publisher(CameraData, 'aruco_data', 2)
+        self.publisher = self.create_publisher(ArucoData, 'aruco_data', 2)
         #### PUBLICATION BLOCK END ####
 
 
@@ -72,7 +73,7 @@ class ArucoDetect(Node):
         self.subs_data = msg
         self.width = msg.width
         self.height = msg.height
-        self.image = np.array(msg.data).resize((self.width, self.height))
+        self.image = np.array(msg.data, np.uint8).resize((self.width, self.height))
         self.get_logger().info(f"Collected image data at time: {self.timestamp}")
         
         # Aruco detection
@@ -82,7 +83,7 @@ class ArucoDetect(Node):
         self.publish_data(x, y, ids, scales)
 
     def publish_data(self, x, y, ids, scales):
-        msg = CameraData()
+        msg = ArucoData()
         msg.x = x.copy()
         msg.y = y.copy()
         msg.ids = ids.copy()
