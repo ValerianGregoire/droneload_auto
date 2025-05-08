@@ -55,6 +55,7 @@ mkdir -p ~/ros2_ws/src
 cd ~/ros2_ws/src
 git clone https://github.com/ValerianGregoire/droneload_auto.git
 git clone https://github.com/ValerianGregoire/droneload_interfaces.git
+git clone -b v2.4.2 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
 
 # Build the workspace
 cd ~/ros2_ws
@@ -64,3 +65,5 @@ colcon build
 echo "source ~/ros2_ws/install/local_setup.bash" >> ~/.bashrc
 source ~/.bashrc
 
+# Download Micro XRCE-DDS Agent
+sudo snap install micro-xrce-dds-agent --edge

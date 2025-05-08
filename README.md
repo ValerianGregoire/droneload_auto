@@ -134,4 +134,19 @@ echo "source ~/ros2_ws/install/local_setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-### 12. Download 
+## Manual PX4-ROS2 Bridge Setup
+
+Run the commands below in a terminal to set up the PX4-ROS2 bridge without using the shell script. 
+
+### 12. Download Micro XRCE-DDS Agent
+```shell
+sudo snap install micro-xrce-dds-agent --edge
+```
+
+### 13. Add the agent package to the workspace
+```shell
+cd ~/ros2_ws/src
+git clone -b v2.4.2 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
+cd ..
+colcon build
+```
