@@ -28,8 +28,10 @@ import rclpy
 from rclpy.node import Node
 import cv2
 import numpy as np
+from droneload_interfaces.msg import CameraData
 
-class LidarRead(Node):
+
+class ArucoDetect(Node):
     def __init__(self):
         super().__init__('aruco_detect')
         self.get_logger().info('Aruco detector initialized')
@@ -37,29 +39,70 @@ class LidarRead(Node):
         self.x = list()
         self.y = list()
 
-    def detect_aruco_positions(self, image_path):
-        # Load the image
-        image = cv2.imread(image_path)
-        if image is None:
-            raise FileNotFoundError(f"Image at path {image_path} could not be loaded.")
+        self.r = self.g = self.b = None
+        self.width = self.height = None
+        self.image = None
+
+        ##### SUBSCRIPTION BLOCK START #####
+        self.timestamp = None
+        self.subs_data = None
+        self.subscription = self.create_subscription(
+            CameraData,
+            'camera_data',
+            self.listener_callback,
+            1)
+        self.subscription
+        ##### SUBSCRIPTION BLOCK END #####
+
+
+        #### PUBLICATION BLOCK START ####
+        self.publisher = self.create_publisher(CameraData, 'aruco_data', 2)
+        #### PUBLICATION BLOCK END ####
+
+
+        #### ARUCO DETECTION BLOCK START ####
+        self.aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_100)
+        self.parameters = cv2.aruco.DetectorParameters()
+        self.detector = cv2.aruco.ArucoDetector(self.aruco_dict, self.parameters)
+        #### ARUCO DETECTION BLOCK END ####
+
+    def listener_callback(self, msg):
+        # Reads image data when published
+        self.timestamp = msg.timestamp
+        self.subs_data = msg
+        self.width = msg.width
+        self.height = msg.height
+        self.image = np.array(msg.data).resize((self.width, self.height))
+        self.get_logger().info(f"Collected image data at time: {self.timestamp}")
         
-        # Get image dimensions
-        height, width, _ = image.shape
+        # Aruco detection
+        x, y, ids, scales = self.detect_aruco_positions()
 
-        # Define the dictionary you are using (4x4_50 is a common choice)
-        aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
-        parameters = cv2.aruco.DetectorParameters()
+        # aruco_data topic publication
+        self.publish_data(x, y, ids, scales)
 
-        # Create the detector
-        detector = cv2.aruco.ArucoDetector(aruco_dict, parameters)
+    def publish_data(self, x, y, ids, scales):
+        msg = CameraData()
+        msg.x = x.copy()
+        msg.y = y.copy()
+        msg.ids = ids.copy()
+        msg.scales = scales.copy()
+        msg.timestamp = self.get_clock().now().nanoseconds
+        self.publisher.publish(msg)
+
+    def detect_aruco_positions(self):
 
         # Detect the markers
-        corners, ids, _ = detector.detectMarkers(image)
+        corners, ids, _ = self.detector.detectMarkers(self.image)
 
-        positions = []
+        markers_x = []
+        markers_y = []
         detected_ids = []
+        scales = []
 
         if ids is not None:
+            total_area = self.width * self.height
+
             for corner, marker_id in zip(corners, ids.flatten()):
                 # Compute the center point of the marker
                 c = corner[0]
@@ -67,21 +110,29 @@ class LidarRead(Node):
                 center_y = np.mean(c[:, 1])
 
                 # Normalize between 0 and 1
-                norm_x = center_x / width
-                norm_y = center_y / height
+                norm_x = center_x / self.width
+                norm_y = center_y / self.height
 
-                positions.append((norm_x, norm_y))
+                # Compute the area of the marker using the shoelace formula
+                area = 0.5 * np.abs(
+                    c[0,0]*c[1,1] + c[1,0]*c[2,1] + c[2,0]*c[3,1] + c[3,0]*c[0,1]
+                    - c[1,0]*c[0,1] - c[2,0]*c[1,1] - c[3,0]*c[2,1] - c[0,0]*c[3,1]
+                )
+
+                # Normalize the area between 0 and 1
+                norm_area = area / total_area
+
+                markers_x.append(norm_x)
+                markers_y.append(norm_y)
                 detected_ids.append(marker_id)
+                scales.append(norm_area)
 
-        return positions, detected_ids
-
-
-
+        return markers_x, markers_y, detected_ids, scales
 
 def main(args=None):
     rclpy.init(args=args)
 
-    node = LidarRead()
+    node = ArucoDetect()
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:

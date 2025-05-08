@@ -38,7 +38,7 @@ vcs import --input https://raw.githubusercontent.com/ros2/ros2/humble/ros2.repos
 sudo apt upgrade
 sudo rosdep init
 rosdep update
-rosdep install --from-paths src --ignore-src -y --skip-keys "fastcdr rti-connext-dds-6.0.1 urdfdom_headers"
+rosdep install --from-paths src --ignore-src -y --skip-keys "fastcdr rti-connext-dds-6.0.1 urdfdom_headers rosidl_defaults"
 
 # Build the code in the workspace
 cd ~/ros2_humble/
@@ -56,6 +56,8 @@ cd ~/ros2_ws/src
 git clone https://github.com/ValerianGregoire/droneload_auto.git
 git clone https://github.com/ValerianGregoire/droneload_interfaces.git
 git clone -b v2.4.2 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
+git clone https://github.com/PX4/px4_msgs.git
+git clone https://github.com/PX4/px4_ros_com.git
 
 # Build the workspace
 cd ~/ros2_ws

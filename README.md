@@ -143,10 +143,12 @@ Run the commands below in a terminal to set up the PX4-ROS2 bridge without using
 sudo snap install micro-xrce-dds-agent --edge
 ```
 
-### 13. Add the agent package to the workspace
+### 13. Add the agent package and its dependencies to the workspace
 ```shell
 cd ~/ros2_ws/src
 git clone -b v2.4.2 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
-cd ..
+git clone https://github.com/PX4/px4_msgs.git
+git clone https://github.com/PX4/px4_ros_com.git
+cd ~/ros2_ws/
 colcon build
 ```
