@@ -28,8 +28,8 @@ import rclpy
 from rclpy.node import Node
 import cv2
 import numpy as np
-from droneload_interfaces.msg import CameraData
 from droneload_interfaces.msg import ArucoData
+from sensor_msgs.msg import Image
 
 
 class ArucoDetect(Node):
@@ -48,8 +48,8 @@ class ArucoDetect(Node):
         self.timestamp = None
         self.subs_data = None
         self.subscription = self.create_subscription(
-            CameraData,
-            'camera_data',
+            Image,
+            '/camera/image_raw',
             self.listener_callback,
             1)
         self.subscription
@@ -68,14 +68,44 @@ class ArucoDetect(Node):
         #### ARUCO DETECTION BLOCK END ####
 
     def listener_callback(self, msg):
-        # Reads image data when published
-        self.timestamp = msg.timestamp
-        self.subs_data = msg
+        # Extract timestamp from header
+        self.timestamp = msg.header.stamp.sec * 1_000_000_000 + msg.header.stamp.nanosec
+
+        # Get image dimensions
         self.width = msg.width
         self.height = msg.height
-        self.image = np.array(msg.data, np.uint8).resize((self.width, self.height))
-        self.get_logger().info(f"Collected image data at time: {self.timestamp}")
+
+        # Convert image data to NumPy array
+        image_data = np.frombuffer(msg.data, dtype=np.uint8)
+
+        # Determine image format and reshape accordingly
+        encoding = msg.encoding.upper()
+        if encoding in ['RGB8', 'BGR8']:
+            channels = 3
+        elif encoding == 'MONO8':
+            channels = 1
+        else:
+            self.get_logger().error(f"Unsupported image encoding: {msg.encoding}")
+            return
+
+        expected_size = self.height * self.width * channels
+        if image_data.size != expected_size:
+            self.get_logger().error(
+                f"Image data size mismatch: got {image_data.size}, expected {expected_size}")
+            return
+
+        try:
+            self.image = image_data.reshape((self.height, self.width, channels)) \
+                if channels > 1 else image_data.reshape((self.height, self.width))
+        except ValueError as e:
+            self.get_logger().error(f"Image reshaping failed: {e}")
+            return
         
+        if encoding == 'RGB8':
+            self.image = cv2.cvtColor(self.image, cv2.COLOR_RGB2BGR)
+
+        self.get_logger().info(f"Received image at timestamp: {self.timestamp}")
+
         # Aruco detection
         x, y, ids, scales = self.detect_aruco_positions()
 

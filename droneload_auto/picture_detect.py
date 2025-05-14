@@ -7,14 +7,13 @@ from collections import deque
 
 import rclpy
 from rclpy.node import Node
-from droneload_interfaces.msg import CameraData
+from droneload_interfaces.msg import PictureData
+from sensor_msgs.msg import Image
 
 class PictureDetect(Node):
     def __init__(self):
         super().__init__('picture_detect')
-
-
-
+        
         ################ SUBSCRIBER to the camera data topic
         self.subscription = self.create_subscription(
             CameraData,
