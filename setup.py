@@ -11,7 +11,7 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
     ],
-    install_requires=['setuptools'],
+    install_requires=['setuptools', 'opencv-python'],
     zip_safe=True,
     maintainer='Valerian',
     maintainer_email='valerian.greg@gmail.com',
@@ -22,7 +22,9 @@ setup(
         'console_scripts': [
         	'hello_world = droneload_auto.hello_world:main',
             'lidar_read = droneload_auto.lidar_read:main',
-            'camera_read = droneload_auto.camera_read:main'
+            'camera_read = droneload_auto.camera_read:main',
+            'aruco_detect = droneload_auto.aruco_detect:main',
+            
         ],
     },
 )
