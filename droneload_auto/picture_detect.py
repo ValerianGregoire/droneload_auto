@@ -24,22 +24,20 @@ ros2 run droneload_auto picture_detect
 """
 # The lidar data should be written to the 'PictureData' topic when possible
 
-
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from std_msgs.msg import Header
 from cv_bridge import CvBridge
 
+from ultralytics import YOLO
 import cv2
 import numpy as np
 import os
 import time
 
-from ultralytics import YOLO
-from ament_index_python.packages import get_package_share_directory
-
-from droneload_interfaces.msg import PictureData  # ← Import your custom message
+from ament_index_python.packages import get_package_share_director
+from droneload_interfaces.msg import PictureData
 
 
 class PictureDetect(Node):
@@ -48,9 +46,8 @@ class PictureDetect(Node):
         self.get_logger().info("Picture Detector Initialized")
 
         # === CONFIGURATION ===
-        package_name = 'droneload_auto'  # Change if different
+        package_name = 'droneload_auto'
         model_file = 'yolov8_custom.pt'
-        classes_file = 'classes.txt'
         self.image_topic = '/camera/image_raw'
 
         # === LOAD MODEL AND CLASSES ===
@@ -91,46 +88,54 @@ class PictureDetect(Node):
             return
 
         image_height, image_width = cv_image.shape[:2]
-        results = self.model(cv_image, verbose=False)[0]
-
-        if results.boxes is None or len(results.boxes) == 0:
-            self.get_logger().info("No detections.")
-            return
-
-        x_centers = []
-        y_centers = []
-        labels = []
-
-        for box in results.boxes:
-            class_id = int(box.cls.item())
-            conf = float(box.conf.item())
-            class_name = self.class_names[class_id] if class_id < len(self.class_names) else f"id_{class_id}"
-
-            x1, y1, x2, y2 = map(int, box.xyxy[0].tolist())
-            x_center = (x1 + x2) / 2.0
-            y_center = (y1 + y2) / 2.0
-
-            # Normalize
-            norm_x = float(x_center) / image_width
-            norm_y = float(y_center) / image_height
-
-            x_centers.append(norm_x)
-            y_centers.append(norm_y)
-            labels.append(class_name)
-
-            self.get_logger().info(
-                f"Detected {class_name} ({conf:.2f}) at norm pos ({norm_x:.3f}, {norm_y:.3f})"
-            )
+        
+        x, y, clss, cf, sc = self.detect_picture(cv_image, image_height, image_width)
 
         # === CREATE AND PUBLISH PictureData ===
         picture_msg = PictureData()
         picture_msg.timestamp = int(self.get_clock().now().nanoseconds / 1e6)  # milliseconds
-        picture_msg.x = x_centers
-        picture_msg.y = y_centers
-        picture_msg.labels = labels
-
+        picture_msg.x = x
+        picture_msg.y = y
+        picture_msg.values = clss
+        picture_msg.confidences = cf
+        picture_msg.scales = sc
         self.picture_data_pub.publish(picture_msg)
 
+    def detect_picture(self, image_data, width=400, height=400):
+        pictures_x = []
+        pictures_y = []
+        classes = []
+        confidences = []
+        scales = []
+
+        # Load YOLOv8 model
+        resized_img = cv2.resize(image_data, (width, height))
+
+        # Run inference
+        results = self.model(resized_img)
+
+        # Compute the center point of the found object
+        for box in results[0].boxes:
+            c = box.xyxy[0]
+            center_x = (c[0] + c[2]) / 2
+            center_y = (c[1] + c[3]) / 2
+
+            # Normalize between 0 and 1
+            norm_x = center_x / width
+            norm_y = center_y / height
+
+            # Compute the area of the bounding box using the shoelace formula
+            area = (c[2] - c[0]) * (c[3] - c[1])
+
+            # Normalize the area between 0 and 1
+            norm_area = area / (width * height)
+
+            pictures_x.append(float(norm_x))
+            pictures_y.append(float(norm_y))
+            classes.append(self.model.names[int(box.cls[0])])
+            confidences.append(float(box.conf[0]))
+            scales.append(float(norm_area))
+        return pictures_x, pictures_y, classes, confidences, scales
 
 def main(args=None):
     rclpy.init(args=args)
@@ -142,7 +147,6 @@ def main(args=None):
     finally:
         node.destroy_node()
         rclpy.shutdown()
-
 
 if __name__ == '__main__':
     main()

@@ -1,7 +1,6 @@
 from ultralytics import YOLO
 import cv2
 
-
 def detect_picture(image_data, width=400, height=400):
     pictures_x = []
     pictures_y = []
