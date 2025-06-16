@@ -56,7 +56,7 @@ def detect_aruco_positions(image_data, width=400, height=400):
 if __name__ == "__main__":
 
     # Load the image (make sure to use a grayscale image)
-    image_path = "template_images/window_3_arucos_broken.png"
+    image_path = "template_images/p3.jpg"
     image_data = Image.open(image_path).convert("L")
     width, height = image_data.size # Get the dimensions of the image
 

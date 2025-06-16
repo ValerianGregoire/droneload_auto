@@ -204,7 +204,7 @@ def plot_points_on_image(image, x, y, labels, circle_radius=10, circle_color='re
 if __name__ == "__main__":
 
     # Load the image
-    image_path = "template_images/window_2_arucos.png"
+    image_path = "template_images/d2.jpg"
 
     # Convert the image to a PIL object then to a numpy array
     image = Image.open(image_path)
