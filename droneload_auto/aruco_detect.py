@@ -68,6 +68,7 @@ class ArucoDetect(Node):
         #### ARUCO DETECTION BLOCK END ####
 
     def listener_callback(self, msg):
+
         # Extract timestamp from header
         self.timestamp = msg.header.stamp.sec * 1_000_000_000 + msg.header.stamp.nanosec
 
@@ -104,7 +105,7 @@ class ArucoDetect(Node):
         if encoding == 'RGB8':
             self.image = cv2.cvtColor(self.image, cv2.COLOR_RGB2BGR)
 
-        self.get_logger().info(f"Received image at timestamp: {self.timestamp}")
+        self.get_logger().info(f"Received image at timestamp: {self.timestamp}; Detecting Arucos...")
 
         # Aruco detection
         x, y, ids, scales = self.detect_aruco_positions()
@@ -119,6 +120,7 @@ class ArucoDetect(Node):
         msg.ids = ids.copy()
         msg.scales = scales.copy()
         msg.timestamp = self.get_clock().now().nanoseconds
+        self.get_logger().info(f"Found {len(x)} Arucos; Publishing results...")
         self.publisher.publish(msg)
 
     def detect_aruco_positions(self):

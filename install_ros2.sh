@@ -17,17 +17,25 @@ sudo apt update && sudo apt install -y \
   python3-flake8-docstrings \
   python3-pip \
   python3-pytest-cov \
-  ros-dev-tools
-sudo apt install -y \
-   python3-flake8-blind-except \
-   python3-flake8-builtins \
-   python3-flake8-class-newline \
-   python3-flake8-comprehensions \
-   python3-flake8-deprecated \
-   python3-flake8-import-order \
-   python3-flake8-quotes \
-   python3-pytest-repeat \
-   python3-pytest-rerunfailures
+  ros-dev-tools \
+  python3-flake8-blind-except \
+  python3-flake8-builtins \
+  python3-flake8-class-newline \
+  python3-flake8-comprehensions \
+  python3-flake8-deprecated \
+  python3-flake8-import-order \
+  python3-flake8-quotes \
+  python3-pytest-repeat \
+  python3-pytest-rerunfailures \
+  python3-opencv \
+  ros-humble-image-publisher \
+  ros-humble-cv-bridge \
+  libopencv-dev \
+  ros-humble-image-tools \
+  ros-humble-rqt-image-publisher
+
+
+pip install opencv-contrib-python numpy PIL
 
 # Get ROS 2 code
 mkdir -p ~/ros2_humble/src
@@ -58,9 +66,14 @@ git clone https://github.com/ValerianGregoire/droneload_interfaces.git
 git clone -b v2.4.2 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
 git clone https://github.com/PX4/px4_msgs.git
 git clone https://github.com/PX4/px4_ros_com.git
+git clone https://github.com/ros-perception/vision_opencv.git
+git clone https://github.com/ros-perception/image_pipeline.git
 
 # Build the workspace
 cd ~/ros2_ws
+rosdep install --from-paths src --ignore-src -r -y
+colcon build --packages-up-to vision_opencv
+colcon build --packages-up-to image_pipeline
 colcon build
 
 # Source the workspace in all terminals
